@@ -87,7 +87,7 @@
                 app:icon="@drawable/pauseicono"
                 app:iconGravity="textTop"
                 app:iconSize="50dp"
-                app:iconTint="@color/white" />
+                app:iconTint="#BF3D3D" />
 
             <Button
                 android:id="@+id/btnrecord"
@@ -100,7 +100,7 @@
                 app:icon="@drawable/grabaricon"
                 app:iconGravity="textStart"
                 app:iconSize="90dp"
-                app:iconTint="@color/white" />
+                app:iconTint="#BF3D3D" />
 
             <Button
                 android:id="@+id/btnstop"
@@ -112,7 +112,7 @@
                 app:icon="@drawable/stopicon"
                 app:iconGravity="textTop"
                 app:iconSize="50dp"
-                app:iconTint="@color/white" />
+                app:iconTint="#BF3D3D" />
         </LinearLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
