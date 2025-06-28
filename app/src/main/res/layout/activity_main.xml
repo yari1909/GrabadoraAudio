@@ -4,7 +4,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background_gradient"
+    android:background="@color/fondo"
     android:visibility="visible"
     tools:context=".MainActivity">
 
@@ -22,19 +22,19 @@
             android:id="@+id/my_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@drawable/toolbar_gradient"
+            android:background="@drawable/bgtoolbar"
             android:elevation="5dp"
             app:menu="@menu/toolbar"
             app:navigationIconTint="@android:color/white"
             app:title="Voice recorder"
             app:titleCentered="true"
-            app:titleTextColor="@android:color/white"
-            />
+            app:titleTextColor="@android:color/white" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:backgroundTint="@color/fondo"
         android:gravity="center"
         android:orientation="vertical"
         android:paddingLeft="20dp"
@@ -42,21 +42,22 @@
         android:paddingRight="20dp">
 
         <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:id="@+id/imgmicro"
+            android:layout_width="287dp"
+            android:layout_height="181dp"
             android:layout_marginTop="80dp"
             android:layout_marginBottom="60dp"
-            app:srcCompat="@drawable/audiowave" />
+            app:srcCompat="@drawable/voice1" />
 
         <TextView
             android:id="@+id/txtTime"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:backgroundTint="#BA2121"
             android:fontFamily="sans-serif-black"
             android:text="00.00.00"
             android:textAlignment="center"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/design_default_color_error"
             android:textSize="25sp" />
 
         <View
@@ -66,12 +67,12 @@
             android:layout_marginTop="40dp"
             android:layout_marginBottom="80dp"
             android:alpha="0.4"
-            android:background="@color/white" />
+            android:background="@color/design_default_color_error" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="230dp"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="20dp"
             android:gravity="center"
             android:orientation="horizontal">
 
