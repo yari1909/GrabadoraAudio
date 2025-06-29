@@ -2,8 +2,11 @@ package com.yg.grabadoraaudio;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.icu.text.SimpleDateFormat;
 import android.media.MediaRecorder;
 import android.os.Build;
@@ -40,7 +43,7 @@ import java.util.Set;
 public class MainActivity extends AppCompatActivity {
     Button btnGrabar, btnPausar, btnParar;
     TextView txtTime;
-    RecyclerView rcGrabaciones;
+   // RecyclerView rcGrabaciones;
 
     adaptador_grabadora adapter;
     ArrayList<grabar> grabacionesArrayList = new ArrayList<>();
@@ -88,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
         btnParar = findViewById(R.id.btnstop);
         txtTime = findViewById(R.id.txtTime);
         btnPausar = findViewById(R.id.btnpause);
-        rcGrabaciones = findViewById(R.id.rcGrabaciones);
+        // rcGrabaciones = findViewById(R.id.rcGrabaciones);
         imgmicro1 = findViewById(R.id.imgmicro);
         MaterialToolbar toolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
@@ -98,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Configurar componentes
         configurarCronometro();
-        configurarRecyclerView();
+        // configurarRecyclerView();
 // cargarGrabaciones();
 
         btnPausar.setEnabled(false);
@@ -126,12 +129,12 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void configurarRecyclerView() {
+  /*  private void configurarRecyclerView() {
         // USAR TU ADAPTADOR
         adapter = new adaptador_grabadora(grabacionesArrayList, this);
         rcGrabaciones.setLayoutManager(new LinearLayoutManager(this));
         rcGrabaciones.setAdapter(adapter);
-    }
+    }*/
 
 
     private void guardarGrabacion(String nombre, String ruta, String duracion, String fecha) {
@@ -143,14 +146,14 @@ public class MainActivity extends AppCompatActivity {
         sharedPreferences.edit().putStringSet(KEY_GRABACIONES, grabacionesSet).apply();
 
         // Limpiar la lista para mostrar solo la última grabación
-        grabacionesArrayList.clear();
+      //  grabacionesArrayList.clear();
 
         // Agregar solo la nueva grabación a la lista
         grabar nueva = new grabar(nombre, ruta, duracion, fecha);
-        grabacionesArrayList.add(nueva);
+        // grabacionesArrayList.add(nueva);
 
         // Notificar al adaptador para actualizar la vista
-        adapter.notifyDataSetChanged();
+        // adapter.notifyDataSetChanged();
     }
 
     /**
@@ -257,12 +260,13 @@ public class MainActivity extends AppCompatActivity {
             // CONFIGURACION MEDIARECORDER
             grabacion = new MediaRecorder();
             grabacion.setAudioSource(MediaRecorder.AudioSource.MIC);
-            grabacion.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP); // Formato 3GP
-            grabacion.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB); // Codificador de audio
-            grabacion.setOutputFile(rutaArchivo); // Archivo donde guardar
+            grabacion.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+            grabacion.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+            grabacion.setOutputFile(rutaArchivo);
 
             grabacion.prepare();
             grabacion.start();
+
 
             // INICIAR EL CRONOMETRO
 
@@ -355,8 +359,20 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             // DETENER MEDIARECORDER
-            grabacion.stop();
-            grabacion.release();
+            try {
+                grabacion.stop();
+                grabacion.release();
+            } catch (RuntimeException e) {
+                e.printStackTrace();
+                Toast.makeText(this, "Error al detener y guardar la grabación", Toast.LENGTH_SHORT).show();
+                // Opcional: eliminar archivo corrupto
+                File archivo = new File(rutaArchivo);
+                if (archivo.exists()) archivo.delete();
+            }
+
+            // ANIMACION
+            animacion grabar1 = new animacion();
+            grabar1.stopRecording(imgmicro1);
 
             // Usar el tiempo calculado en el cronómetro para guardar duración
             String duracionFormateada = formatearDuracion(tiempoFinalGrabacion);
@@ -369,7 +385,7 @@ public class MainActivity extends AppCompatActivity {
             // Contar cuántas grabaciones se han hecho hoy
             int numeroTotal = contarTodasGrabaciones() + 1;
 
-            // Crear nombre personalizado como "Grabación 01"
+            // Crear nombre personalizado
             String nombrePersonalizado = "Grabación " + String.format("%02d", numeroTotal);
 
             // Fecha y hora completa para guardar
@@ -384,6 +400,13 @@ public class MainActivity extends AppCompatActivity {
                             "\nDuración: " + duracionFormateada +
                             "\nFecha: " + timestamp,
                     Toast.LENGTH_LONG).show();
+
+            File archivo = new File(rutaArchivo);
+            if (!archivo.exists()) {
+                Toast.makeText(this, "ERROR: archivo no se creó!", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(this, "Ruta del archivo:\n" + archivo.getAbsolutePath(), Toast.LENGTH_LONG).show();
+            }
 
         } catch (RuntimeException e) {
             e.printStackTrace();
@@ -406,6 +429,8 @@ public class MainActivity extends AppCompatActivity {
         int centesimas = (int) ((duracionMs % 1000) / 10);
         return String.format(Locale.getDefault(), "%02d:%02d.%02d", minutos, segundos, centesimas);
     }
+
+    /*
     private void mostrarDialogoBorrarTodo() {
         if (grabacionesArrayList.isEmpty()) {
             Toast.makeText(this, "No hay grabaciones para borrar", Toast.LENGTH_SHORT).show();
@@ -438,6 +463,8 @@ public class MainActivity extends AppCompatActivity {
 
         Toast.makeText(this, "Todas las grabaciones han sido eliminadas", Toast.LENGTH_SHORT).show();
     }
+    */
+
 
     // Resetea todas las variables y UI al estado inicial
     private void resetearEstadoGrabacion() {
@@ -479,6 +506,17 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    public boolean onOptionsItemSelected(android.view.MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_lista) {
+            Intent intent = new Intent(MainActivity.this, Activity_Grabaciones.class);
+            startActivity(intent);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    /*
     @Override
     public boolean onOptionsItemSelected(android.view.MenuItem item) {
         int id = item.getItemId();
@@ -487,5 +525,5 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
+    }*/
 }

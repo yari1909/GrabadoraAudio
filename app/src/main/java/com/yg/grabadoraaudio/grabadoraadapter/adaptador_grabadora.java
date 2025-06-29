@@ -2,6 +2,7 @@ package com.yg.grabadoraaudio.grabadoraadapter;
 
 import android.content.Context;
 import android.media.MediaPlayer;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.yg.grabadoraaudio.R;
 import com.yg.grabadoraaudio.grabadora.grabar;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -45,7 +47,7 @@ public class adaptador_grabadora extends RecyclerView.Adapter<adaptador_grabador
     @Override
     public adaptador_grabadora.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.activity_grabaciones, parent, false);
+                .inflate(R.layout.item_grabacion, parent, false);
         return new ViewHolder(view);
     }
 
@@ -85,7 +87,28 @@ public class adaptador_grabadora extends RecyclerView.Adapter<adaptador_grabador
     private void reproducirAudio(String rutaArchivo, int position) {
         detenerReproduccion();
 
+        Log.d("REPRODUCCION", "Ruta: " + rutaArchivo);
+        mediaPlayer = new MediaPlayer();
         try {
+            mediaPlayer.setDataSource(rutaArchivo);
+            Log.d("REPRODUCCION", "DataSource seteado");
+            mediaPlayer.prepare();
+            Log.d("REPRODUCCION", "MediaPlayer preparado");
+            mediaPlayer.start();
+            Log.d("REPRODUCCION", "MediaPlayer comenzó");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        try {
+
+            File archivo = new File(rutaArchivo);
+            if (!archivo.exists()) {
+                Toast.makeText(context, "Archivo no encontrado:\n" + rutaArchivo, Toast.LENGTH_LONG).show();
+                return;
+            }
+
             mediaPlayer = new MediaPlayer();
             mediaPlayer.setDataSource(rutaArchivo);
             mediaPlayer.prepare();

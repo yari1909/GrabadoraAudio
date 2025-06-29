@@ -23,67 +23,46 @@ public class Splash_activity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_splash);
 
-        Log.d("SplashDebug", "=== INICIANDO DIAGNÓSTICO ===");
-
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
-        // Debug completo
+
+        // Configurar animación Lottie
         LottieAnimationView animationView = findViewById(R.id.imageView);
 
-        Log.d("SplashDebug", "AnimationView encontrado: " + (animationView != null));
+        // Timer de seguridad - siempre va a MainActivity después de 5 segundos máximo
+        new Handler().postDelayed(this::goToMainActivity, 5000);
 
         if (animationView != null) {
-            Log.d("SplashDebug", "Visibilidad: " + animationView.getVisibility());
-            Log.d("SplashDebug", "Width: " + animationView.getWidth() + ", Height: " + animationView.getHeight());
-
-            // Intentar cargar manualmente
             try {
                 animationView.setAnimation("splashanimation.json");
-                Log.d("SplashDebug", "Animación cargada desde assets");
 
                 animationView.addAnimatorListener(new AnimatorListenerAdapter() {
                     @Override
-                    public void onAnimationStart(Animator animation) {
-                        Log.d("SplashDebug", "Animación INICIADA");
-                    }
-
-                    @Override
                     public void onAnimationEnd(Animator animation) {
-                        Log.d("SplashDebug", "Animación TERMINADA");
+                        // Ir a MainActivity cuando termine la animación
+                        goToMainActivity();
                     }
                 });
 
                 animationView.playAnimation();
-                Log.d("SplashDebug", "playAnimation() llamado");
-
             } catch (Exception e) {
-                Log.e("SplashDebug", "Error cargando animación: " + e.getMessage());
-                e.printStackTrace();
+                // Si hay error con la animación, ir directo a MainActivity
+                new Handler().postDelayed(this::goToMainActivity, 2000);
             }
+        } else {
+            // Si no hay animación, usar delay fijo
+            new Handler().postDelayed(this::goToMainActivity, 3000);
         }
-
-        // Verificar si el archivo existe
-        try {
-            String[] assets = getAssets().list("");
-            Log.d("SplashDebug", "Archivos en assets:");
-            for (String asset : assets) {
-                Log.d("SplashDebug", "- " + asset);
-            }
-        } catch (Exception e) {
-            Log.e("SplashDebug", "Error listando assets: " + e.getMessage());
-        }
-
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Intent intent = new Intent(Splash_activity.this, MainActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        }, 5000);
     }
-}
+
+    private void goToMainActivity() {
+
+            Intent intent = new Intent(Splash_activity.this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
+    }

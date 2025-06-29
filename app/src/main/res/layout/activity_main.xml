@@ -98,7 +98,7 @@
                 android:backgroundTint="#00FFFFFF"
                 android:elevation="25dp"
                 android:stateListAnimator="@null"
-                app:icon="@drawable/play"
+                app:icon="@drawable/grabaricon"
                 app:iconGravity="textStart"
                 app:iconSize="90dp"
                 app:iconTint="#BF3D3D" />
