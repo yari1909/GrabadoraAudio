@@ -45,6 +45,12 @@ public class Activity_Grabaciones extends AppCompatActivity {
         MaterialToolbar toolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
 
+        // Habilitar botón de "volver"
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.volver);
+        }
+
         cargarGrabaciones();
         adapter = new adaptador_grabadora(listaGrabaciones, this);
         rcGrabaciones.setLayoutManager(new LinearLayoutManager(this));
@@ -61,6 +67,22 @@ public class Activity_Grabaciones extends AppCompatActivity {
                 listaGrabaciones.add(g);
             }
         }
+
+        // Ordenar por el número
+        listaGrabaciones.sort((a, b) -> {
+            int numA = extraerNumero(a.getNombrePersonalizado());
+            int numB = extraerNumero(b.getNombrePersonalizado());
+            // Orden ascendente: 1, 2, 3, 4
+            return Integer.compare(numA, numB);
+        });
+    }
+
+    private int extraerNumero(String nombre) {
+        try {
+            return Integer.parseInt(nombre.replaceAll("\\D+", "")); // elimina letras y deja números
+        } catch (NumberFormatException e) {
+            return 0; // si no hay número, devolver 0
+        }
     }
 
     @Override
@@ -71,6 +93,12 @@ public class Activity_Grabaciones extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
+        if (item.getItemId() == android.R.id.home) {
+            finish();  // Termina esta actividad y vuelve a la anterior
+            return true;
+        }
+
         if (item.getItemId() == R.id.action_borrar) {
             if (modoSeleccion) {
                 eliminarSeleccionados();
