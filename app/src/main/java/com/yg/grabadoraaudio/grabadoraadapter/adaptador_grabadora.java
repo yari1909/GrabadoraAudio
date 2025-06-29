@@ -25,6 +25,17 @@ public class adaptador_grabadora extends RecyclerView.Adapter<adaptador_grabador
     private MediaPlayer mediaPlayer;
     private int posicionReproduciendo = -1;
 
+    // Interfaz para notificar un long click
+    public interface OnItemLongClickListener {
+        void onItemLongClick(int position, grabar grabacion);
+    }
+
+    private OnItemLongClickListener longClickListener;
+
+    public void setOnItemLongClickListener(OnItemLongClickListener listener) {
+        this.longClickListener = listener;
+    }
+
     public adaptador_grabadora(ArrayList<grabar> grabaciones, Context context) {
         this.grabaciones = grabaciones;
         this.context = context;
@@ -42,11 +53,10 @@ public class adaptador_grabadora extends RecyclerView.Adapter<adaptador_grabador
     public void onBindViewHolder(@NonNull adaptador_grabadora.ViewHolder holder, int position) {
         grabar grabacion = grabaciones.get(position);
 
-
+        holder.txtNombre.setText(grabacion.getNombrePersonalizado());
         holder.txtDuracion.setText(grabacion.getDuracion());
         holder.txtFecha.setText(grabacion.getFechaCreacion());
 
-        // Cambiar texto del botón según el estado
         if (position == posicionReproduciendo && mediaPlayer != null && mediaPlayer.isPlaying()) {
             holder.btnReproducir.setText("PARAR");
         } else {
@@ -55,18 +65,24 @@ public class adaptador_grabadora extends RecyclerView.Adapter<adaptador_grabador
 
         holder.btnReproducir.setOnClickListener(v -> {
             if (position == posicionReproduciendo && mediaPlayer != null && mediaPlayer.isPlaying()) {
-                // Parar reproducción
                 detenerReproduccion();
                 notifyItemChanged(position);
             } else {
-                // Iniciar reproducción
                 reproducirAudio(grabacion.getRutaArchivo(), position);
             }
+        });
+
+        // Long click para borrar grabación individual
+        holder.itemView.setOnLongClickListener(v -> {
+            if (longClickListener != null) {
+                longClickListener.onItemLongClick(position, grabacion);
+                return true;
+            }
+            return false;
         });
     }
 
     private void reproducirAudio(String rutaArchivo, int position) {
-        // Detener reproducción anterior si existe
         detenerReproduccion();
 
         try {
@@ -78,7 +94,6 @@ public class adaptador_grabadora extends RecyclerView.Adapter<adaptador_grabador
             posicionReproduciendo = position;
             notifyItemChanged(position);
 
-            // Listener para cuando termina la reproducción
             mediaPlayer.setOnCompletionListener(mp -> {
                 detenerReproduccion();
                 notifyItemChanged(position);
@@ -103,7 +118,6 @@ public class adaptador_grabadora extends RecyclerView.Adapter<adaptador_grabador
         posicionReproduciendo = -1;
     }
 
-
     public void limpiarRecursos() {
         detenerReproduccion();
     }
@@ -114,12 +128,12 @@ public class adaptador_grabadora extends RecyclerView.Adapter<adaptador_grabador
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        TextView txtDuracion, txtFecha;
+        TextView txtNombre, txtDuracion, txtFecha;
         Button btnReproducir;
 
         public ViewHolder(View itemView) {
             super(itemView);
-
+            txtNombre = itemView.findViewById(R.id.txtNombreGrabacion);
             txtDuracion = itemView.findViewById(R.id.txtDuracionGrabacion);
             txtFecha = itemView.findViewById(R.id.txtFechaGrabacion);
             btnReproducir = itemView.findViewById(R.id.btnReproducir);

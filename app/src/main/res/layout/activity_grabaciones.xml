@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
@@ -21,9 +22,7 @@
             app:menu="@menu/toolbar"
             app:navigationIconTint="@android:color/white"
             app:title="Voice recorder"
-            app:titleTextColor="@android:color/white"
-            />
-
+            app:titleTextColor="@android:color/white" />
     </LinearLayout>
 
     <LinearLayout
@@ -35,14 +34,16 @@
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="100dp"
+            android:layout_marginTop="75dp"
             android:backgroundTint="#d3d7fe">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="10dp">
+                android:padding="10dp"
+                android:layout_marginTop="15dp"
+                android:gravity="center_vertical">
 
                 <ImageView
                     android:id="@+id/imageView2"
@@ -51,44 +52,44 @@
                     app:srcCompat="@drawable/playicon" />
 
                 <TextView
-                    android:id="@+id/textView"
+                    android:id="@+id/txtNombreGrabacion"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Grabación 01"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:layout_marginBottom="4dp" />
+
+                <Button
+                    android:id="@+id/btnReproducir"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="Grabacion 001"
-                    android:textSize="20sp" />
+                    android:backgroundTint="@color/material_dynamic_neutral70"
+                    android:text="REPRODUCIR"
+                    app:cornerRadius="5dp" />
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="15dp">
 
             <TextView
                 android:id="@+id/txtDuracionGrabacion"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="TextView" />
+                android:text="Duración" />
 
             <TextView
                 android:id="@+id/txtFechaGrabacion"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="TextView" />
+                android:text="Fecha" />
 
-            <TextView
-                android:id="@+id/textView2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="TextView" />
-
-            <Button
-                android:id="@+id/btnReproducir"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Button" />
         </LinearLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
