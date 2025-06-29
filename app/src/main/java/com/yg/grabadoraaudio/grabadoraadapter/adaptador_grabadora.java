@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,6 +20,9 @@ import com.yg.grabadoraaudio.grabadora.grabar;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class adaptador_grabadora extends RecyclerView.Adapter<adaptador_grabadora.ViewHolder> {
 
@@ -27,20 +31,48 @@ public class adaptador_grabadora extends RecyclerView.Adapter<adaptador_grabador
     private MediaPlayer mediaPlayer;
     private int posicionReproduciendo = -1;
 
-    // Interfaz para notificar un long click
-    public interface OnItemLongClickListener {
-        void onItemLongClick(int position, grabar grabacion);
-    }
+    private boolean modoSeleccion = false;
 
-    private OnItemLongClickListener longClickListener;
+    // Para controlar los items seleccionados en modo selección
+    private Set<Integer> seleccionados = new HashSet<>();
 
-    public void setOnItemLongClickListener(OnItemLongClickListener listener) {
-        this.longClickListener = listener;
-    }
+    // Callback para notificar al activity cuando eliminar seleccionados
+    private Runnable onEliminarSeleccionados;
 
     public adaptador_grabadora(ArrayList<grabar> grabaciones, Context context) {
         this.grabaciones = grabaciones;
         this.context = context;
+    }
+
+    public void setLista(ArrayList<grabar> nuevaLista) {
+        this.grabaciones = nuevaLista;
+        seleccionados.clear();
+        notifyDataSetChanged();
+    }
+
+    // Método para activar o desactivar modo selección
+    public void activarSeleccion(boolean activar) {
+        modoSeleccion = activar;
+        if (!activar) {
+            seleccionados.clear();
+        }
+        notifyDataSetChanged();
+    }
+
+    // Establecer el callback para eliminar
+    public void setOnEliminarSeleccionados(Runnable callback) {
+        this.onEliminarSeleccionados = callback;
+    }
+
+    // Obtener la lista de grabaciones seleccionadas
+    public List<grabar> obtenerSeleccionados() {
+        List<grabar> lista = new ArrayList<>();
+        for (Integer pos : seleccionados) {
+            if (pos >= 0 && pos < grabaciones.size()) {
+                lista.add(grabaciones.get(pos));
+            }
+        }
+        return lista;
     }
 
     @NonNull
@@ -59,24 +91,43 @@ public class adaptador_grabadora extends RecyclerView.Adapter<adaptador_grabador
         holder.txtDuracion.setText(grabacion.getDuracion());
         holder.txtFecha.setText(grabacion.getFechaCreacion());
 
-        if (position == posicionReproduciendo && mediaPlayer != null && mediaPlayer.isPlaying()) {
-            holder.btnReproducir.setText("PARAR");
+        if (modoSeleccion) {
+            holder.checkboxSeleccion.setVisibility(View.VISIBLE);
+            holder.btnReproducir.setVisibility(View.GONE);
+            holder.checkboxSeleccion.setChecked(seleccionados.contains(position));
+
+            // Listener para checkbox selección
+            holder.checkboxSeleccion.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (isChecked) {
+                    seleccionados.add(position);
+                } else {
+                    seleccionados.remove(position);
+                }
+                // Si todos seleccionados o ninguno, podrías actualizar UI o botones si quieres
+            });
         } else {
-            holder.btnReproducir.setText("REPRODUCIR");
+            holder.checkboxSeleccion.setVisibility(View.GONE);
+            holder.btnReproducir.setVisibility(View.VISIBLE);
+
+            if (position == posicionReproduciendo && mediaPlayer != null && mediaPlayer.isPlaying()) {
+                holder.btnReproducir.setText("PARAR");
+            } else {
+                holder.btnReproducir.setText("REPRODUCIR");
+            }
+
+            holder.btnReproducir.setOnClickListener(v -> {
+                if (position == posicionReproduciendo && mediaPlayer != null && mediaPlayer.isPlaying()) {
+                    detenerReproduccion();
+                    notifyItemChanged(position);
+                } else {
+                    reproducirAudio(grabacion.getRutaArchivo(), position);
+                }
+            });
         }
 
-        holder.btnReproducir.setOnClickListener(v -> {
-            if (position == posicionReproduciendo && mediaPlayer != null && mediaPlayer.isPlaying()) {
-                detenerReproduccion();
-                notifyItemChanged(position);
-            } else {
-                reproducirAudio(grabacion.getRutaArchivo(), position);
-            }
-        });
-
-        // Long click para borrar grabación individual
+        // Long click para borrar grabación individual solo si NO está en modo selección
         holder.itemView.setOnLongClickListener(v -> {
-            if (longClickListener != null) {
+            if (!modoSeleccion && longClickListener != null) {
                 longClickListener.onItemLongClick(position, grabacion);
                 return true;
             }
@@ -90,26 +141,11 @@ public class adaptador_grabadora extends RecyclerView.Adapter<adaptador_grabador
         Log.d("REPRODUCCION", "Ruta: " + rutaArchivo);
         mediaPlayer = new MediaPlayer();
         try {
-            mediaPlayer.setDataSource(rutaArchivo);
-            Log.d("REPRODUCCION", "DataSource seteado");
-            mediaPlayer.prepare();
-            Log.d("REPRODUCCION", "MediaPlayer preparado");
-            mediaPlayer.start();
-            Log.d("REPRODUCCION", "MediaPlayer comenzó");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-
-        try {
-
             File archivo = new File(rutaArchivo);
             if (!archivo.exists()) {
                 Toast.makeText(context, "Archivo no encontrado:\n" + rutaArchivo, Toast.LENGTH_LONG).show();
                 return;
             }
-
-            mediaPlayer = new MediaPlayer();
             mediaPlayer.setDataSource(rutaArchivo);
             mediaPlayer.prepare();
             mediaPlayer.start();
@@ -150,9 +186,21 @@ public class adaptador_grabadora extends RecyclerView.Adapter<adaptador_grabador
         return grabaciones.size();
     }
 
+    // Long click interface y setter
+    public interface OnItemLongClickListener {
+        void onItemLongClick(int position, grabar grabacion);
+    }
+
+    private OnItemLongClickListener longClickListener;
+
+    public void setOnItemLongClickListener(OnItemLongClickListener listener) {
+        this.longClickListener = listener;
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView txtNombre, txtDuracion, txtFecha;
         Button btnReproducir;
+        CheckBox checkboxSeleccion;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -160,6 +208,7 @@ public class adaptador_grabadora extends RecyclerView.Adapter<adaptador_grabador
             txtDuracion = itemView.findViewById(R.id.txtDuracionGrabacion);
             txtFecha = itemView.findViewById(R.id.txtFechaGrabacion);
             btnReproducir = itemView.findViewById(R.id.btnReproducir);
+            checkboxSeleccion = itemView.findViewById(R.id.checkboxSeleccion); // Este checkbox debes agregar en item_grabacion.xml
         }
     }
 }

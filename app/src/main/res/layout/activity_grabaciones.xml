@@ -18,6 +18,7 @@
         app:title="Grabaciones"
         app:titleTextColor="@android:color/white" />
 
+    <!-- RecyclerView para mostrar grabaciones -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rcGrabaciones"
         android:layout_width="0dp"
@@ -26,4 +27,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
