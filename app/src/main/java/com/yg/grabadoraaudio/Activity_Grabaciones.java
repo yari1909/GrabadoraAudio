@@ -48,7 +48,7 @@ public class Activity_Grabaciones extends AppCompatActivity {
         // Habilitar botón de "volver"
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setHomeAsUpIndicator(R.drawable.volver);
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.volver8);
         }
 
         cargarGrabaciones();

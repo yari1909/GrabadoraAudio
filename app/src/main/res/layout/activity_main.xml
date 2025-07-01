@@ -22,12 +22,13 @@
             android:id="@+id/my_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@drawable/bgtoolbar"
+            android:background="@drawable/fondotoolbar"
             android:elevation="5dp"
             app:menu="@menu/toolbar"
             app:navigationIconTint="@android:color/white"
             app:title="Voice recorder"
             app:titleCentered="true"
+            app:titleTextAppearance="@style/ToolbarTitleStyle"
             app:titleTextColor="@android:color/white" />
 
     </LinearLayout>
